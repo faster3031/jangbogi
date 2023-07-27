@@ -27,12 +27,13 @@ window.onload = function(){
             // 글자가 json 규칙대로 만들어진 문자열이다.
             // 그러므로 json 글자를 객체로 변환해서 활용한다.
             let obj = JSON.parse(str)
-
             //
             VISUAL_ARR = obj.visual;
             TODAY_GOOD = obj.todaygood;
             SALE_GOOD = obj.salegood;
             NEW_GOOD = obj.newgood;
+            RECONMEND_GOOD = obj.reconmendgood;
+            POPULAR_ICON = obj.popularicon;
             // 비주얼 화면에 배치한다
             showVisual();
             // 오늘의 상품을 화면에 배치
@@ -41,6 +42,10 @@ window.onload = function(){
             showSaleGood();
             // 신상품을 화면에 배치
             showNewGood();
+            // 추천 상품을 화면에 배치
+            showReconmendGood();
+            // 인기물품 아이콘 화면에 배치
+            showPopularIconGood();
         }
     };
 // 자료를 호출한다.
@@ -63,6 +68,12 @@ let saleTag = document.getElementById("data-sale");
 let NEW_GOOD;
 let newTag = document.getElementById("data-new");
 let newListTag = document.getElementById("data-new-list");
+// 추천 물품
+let RECONMEND_GOOD;
+let reconmendTag = document.getElementById("data-reconmend");
+//  인기 물품
+let POPULAR_ICON;
+let popularIconTag = document.getElementById("data-popular-icon");
 // -----------------
     // 비주얼 화면 출력 기능
     function showVisual() {
@@ -179,7 +190,7 @@ let newListTag = document.getElementById("data-new-list");
   }
 
   //할인상품 화면 출력 기능
-function showSaleGood() {
+  function showSaleGood() {
   let html = `
   <div class = "swiper sw-sale">
   <div class = "swiper-wrapper">
@@ -255,13 +266,115 @@ function showSaleGood() {
     // 0번은 출력했으므로
     if(index !== 0){
       tag = `
+      <div class="new-box">
+        <a href = "${item.link}" class = "new-box-img">
+  <img src="../images/${item.pic}" alt="${item.title}"/>
+  </a>
+  <a href = "${item.link}" class = "new-box-title">
+  ${item.title}
+  </a>
+  </div>
       `;
-
     }
-  })
+    html += tag;
+  });
+  newListTag.innerHTML = html;
  }
+
+// 추천물품 화면 출력 기능
+function showReconmendGood() {
+  let html = `
+  <div class = "swiper sw-reconmend">
+  <div class = "swiper-wrapper">
+
+  `;
+  RECONMEND_GOOD.forEach(function(item){
+    let tag = `
+    <div class = "swiper-slide">
+    <div class="good-box">
+      <!-- 제품이미지 -->
+      <a href="${item.link}" class="good-img">
+          <img src="../images/${item.pic}" alt="${item.name}">
+          <span class="good-type">${item.tag}</span>
+
+      </a>
+      <!-- 제품정보 -->
+      <a href="${item.link}" class="good-info">
+          <em>${item.name}</em>(<em>${item.unit}</em>)
+      </a>
+      <!-- 제품가격 -->
+      <a href="${item.link}" class="good-info-price">
+          ${priceToString(item.price)} <em>원</em>
+      </a>
+      <!-- 장바구니 이미지-->
+      <button class="good-add-cart"></button>
+  </div>
+
+    </div>
+    `;
+    html += tag;
+  });
+  html += `
+  </div>
+  </div>
+  `;
+  reconmendTag.innerHTML = html;
+  const swReconmend = new Swiper(".sw-reconmend" ,{
+    slidesPerView: 3,
+    spaceBetween: 16,
+    slidesPerGroup: 3,
+    navigation: {
+      prevEl: ".reconmend .slide-prev",
+      nextEl: ".reconmend .slide-next",
+    },
+    pagination: {
+      el:".reconmend .slide-pg",
+      type: "fraction" ,
+    },
+  });
+}
+// 인기물품 화면 출력 기능
+function showPopularIconGood() {
+  let html = `
+  <div class= "swiper sw-icon">  
+  <div class= "swiper-wrapper">  
+  `;
+  // 데이터처리
+  POPULAR_ICON.forEach(function (item){
+    const tag = `
+    <div class ="swiper-slide">
+    <a href="${item.link}">
+    <span class ="popular-cate-icon"
+    style="
+    background:url('../images/${item.icon}') no-repeat;
+    background-position:0px 0px; 
+    "
+    ></span>
+    <span class="popular-cate-name">${item.txt} </span>
+    </a>
+    </div>
+    `;
+    html += tag;
+  });
+  html += `
+  </div>
+  </div>
+  `;
+  //
+  popularIconTag.innerHTML = html;
+  const swIcon = new Swiper(".sw-icon",{
+    slidesPerView: 7,
+    slidesPerGroup:7,
+    spaceBetween: 10,
+    navigation:{
+      nextEl:".popular-slide-next",
+      prevEl:".popular-slide-prev",
+
+    },
+  });
+}
   // ===============================================
-// 펼침 목록들 보기 기능
+  // 펼침 목록들 보기 기능
   // 더보기 목록기능
   const menuBt = document.getElementById("menu-bt");
   const menuList = document.getElementById("menu-list");
